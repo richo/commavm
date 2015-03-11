@@ -36,9 +36,8 @@ fn emit(ctx: Ctx) {
     }
 }
 
-fn main() {
-    let ref input = ::std::os::args()[1];
-    let file = path::Path::new(input);
+fn load_file(name: &str) -> ast::Crate {
+    let file = path::Path::new(name);
 
 
     let sess = parse::new_parse_sess();
@@ -46,8 +45,10 @@ fn main() {
 
     let mut parser = parse::new_parser_from_file(&sess, cfg, &file);
 
-    let krate = parser.parse_crate_mod();
+    parser.parse_crate_mod()
+}
 
+fn process_crate(krate: ast::Crate) -> Ctx {
     let mut ctx = Ctx::new();
 
     for it in &krate.module.items {
@@ -58,6 +59,15 @@ fn main() {
             _ => {},
         }
     }
+
+    ctx
+}
+
+fn main() {
+    let ref input = ::std::os::args()[1];
+
+    let krate = load_file(input);
+    let ctx = process_crate(krate);
 
     // Jank
     emit(ctx);
