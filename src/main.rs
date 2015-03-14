@@ -4,7 +4,8 @@ extern crate syntax;
 
 use syntax::{parse,ast,abi};
 use std::path;
-use std::old_io::stdio;
+use std::io::Write;
+use std::io;
 
 struct Func {
     pub name: String,
@@ -29,10 +30,15 @@ impl Ctx {
     }
 }
 
-fn emit(ctx: Ctx) {
-    for f in ctx.fns() {
-        print!("{}()", f.name);
-        stdio::println("{\n}");
+impl Ctx {
+    fn emit<W: Write>(&self, writer: &mut W) {
+        for f in self.fns() {
+            writer.write(f.name.as_bytes());
+            writer.write("() {\n".as_bytes());
+            // TODO Write out body
+            writer.write("}\n".as_bytes());
+            writer.flush();
+        }
     }
 }
 
@@ -69,6 +75,5 @@ fn main() {
     let krate = load_file(input);
     let ctx = process_crate(krate);
 
-    // Jank
-    emit(ctx);
+    ctx.emit(&mut io::stdout());
 }
