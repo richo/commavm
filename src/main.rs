@@ -6,18 +6,28 @@ use syntax::{parse,ast,abi};
 use std::path;
 use std::io::Write;
 use std::io;
+use std::collections::HashMap;
 
 struct Func {
     pub name: String,
 }
 
+enum Value {
+    Literal(String),
+}
+
+
 struct Ctx {
     fns: Vec<Func>,
+    locals: HashMap<String, Value>,
 }
 
 impl Ctx {
     pub fn new() -> Ctx {
-        Ctx { fns: vec![] }
+        Ctx {
+            fns: vec![],
+            locals: HashMap::new(),
+        }
     }
 
 
