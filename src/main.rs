@@ -13,9 +13,9 @@ struct Func {
 }
 
 enum Value {
+    Declared,
     Literal(String),
 }
-
 
 struct Ctx {
     fns: Vec<Func>,
@@ -50,6 +50,9 @@ impl Ctx {
             writer.flush();
         }
     }
+
+    fn declare_local(&mut self, name: &str) {
+    }
 }
 
 fn load_file(name: &str) -> ast::Crate {
@@ -70,6 +73,18 @@ fn process_crate(krate: ast::Crate) -> Ctx {
     for it in &krate.module.items {
         match it.node {
             ast::ItemFn(ref dec, safety, abi, _, ref blk) => {
+                for stmt in &blk.stmts {
+                    match stmt.node {
+                        // P<Spanned<foo>> => {
+                        ast::StmtDecl(ref decl, ref id) => {
+                            println!("Spanned: {:?}", decl);
+                        },
+                        ref other => {
+                            println!("Unhandled Stmt: {:?}", other);
+                        },
+                    }
+                }
+
                 ctx.add_fn(Func { name: it.ident.as_str().to_string() });
             },
             ref other => {
