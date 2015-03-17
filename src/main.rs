@@ -62,7 +62,9 @@ fn process_crate(krate: ast::Crate) -> Ctx {
             ast::ItemFn(ref dec, safety, abi, _, ref blk) => {
                 ctx.add_fn(Func { name: it.ident.as_str().to_string() });
             },
-            _ => {},
+            ref other => {
+                panic!("Unexpected Item: {:?}", other);
+            },
         }
     }
 
