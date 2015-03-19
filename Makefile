@@ -1,2 +1,2 @@
-thing: src/main.rs
+thing: src/main.rs $(wildcard src/*.rs)
 	rustc -o ./$@ $<

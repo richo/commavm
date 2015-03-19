@@ -8,8 +8,11 @@ use std::io::Write;
 use std::io;
 use std::collections::HashMap;
 
+mod analysis;
+
 struct Func {
     pub name: String,
+    locals: Vec<analysis::Name>,
 }
 
 enum Value {
@@ -19,14 +22,12 @@ enum Value {
 
 struct Ctx {
     fns: Vec<Func>,
-    locals: HashMap<String, Value>,
 }
 
 impl Ctx {
     pub fn new() -> Ctx {
         Ctx {
             fns: vec![],
-            locals: HashMap::new(),
         }
     }
 
@@ -45,8 +46,11 @@ impl Ctx {
         for f in self.fns() {
             writer.write(f.name.as_bytes());
             writer.write("() {\n".as_bytes());
-            // TODO Write out body
-            writer.write("}\n".as_bytes());
+
+            writer.write("# Locals: ".as_bytes());
+            writer.write(f.locals.connect(", ").as_bytes());
+
+            writer.write("\n}\n".as_bytes());
             writer.flush();
         }
     }
@@ -73,19 +77,12 @@ fn process_crate(krate: ast::Crate) -> Ctx {
     for it in &krate.module.items {
         match it.node {
             ast::ItemFn(ref dec, safety, abi, _, ref blk) => {
-                for stmt in &blk.stmts {
-                    match stmt.node {
-                        // P<Spanned<foo>> => {
-                        ast::StmtDecl(ref decl, ref id) => {
-                            println!("Spanned: {:?}", decl);
-                        },
-                        ref other => {
-                            println!("Unhandled Stmt: {:?}", other);
-                        },
-                    }
-                }
+                let vars = analysis::locals(blk);
 
-                ctx.add_fn(Func { name: it.ident.as_str().to_string() });
+                ctx.add_fn(Func {
+                    name: it.ident.as_str().to_string(),
+                    locals: vars,
+                });
             },
             ref other => {
                 panic!("Unexpected Item: {:?}", other);
