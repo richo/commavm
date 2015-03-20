@@ -45,7 +45,7 @@ struct Funcall {
 #[derive(Debug)]
 struct Assignment {
     receiver: Name,
-    target: Name, // TODO
+    target: Rvalue,
 }
 
 #[derive(Debug)]
@@ -54,12 +54,27 @@ pub enum Stmt {
     Assignment(Assignment),
 }
 
+// Not obviously correct, some of these types need cleaning up pretty desperately
+#[derive(Debug)]
+pub enum Rvalue {
+    Literal(Value),
+    Call(Funcall),
+    Bound(Name),
+}
+
 impl Stmt {
     // Mostly just for sanity reasons
     fn funcall(receiver: ast::Ident, arguments: &[Arg]) -> Stmt {
         Stmt::Funcall(Funcall {
             receiver: receiver.as_str().to_string(),
             arguments: arguments.to_vec(),
+        })
+    }
+
+    fn assign(receiver: ast::Ident, target: Rvalue) -> Stmt {
+        Stmt::Assignment(Assignment {
+            receiver: receiver.as_str().to_string(),
+            target: target,
         })
     }
 }
@@ -78,7 +93,8 @@ pub fn stmts(blk: &ast::Block) -> Vec<Stmt> {
                 } else
                 if let ast::ExprAssign(ref expr, ref id) = expr.node {
                     if let ast::ExprPath(_, ref path) = expr.node {
-                        // println!("Assign: {:?}", path.segments);
+                        let ref segment = path.segments[0];
+                        stmts.push(Stmt::assign(segment.identifier, Rvalue::Literal(Value))); // TODO
                     }
                 }
             },

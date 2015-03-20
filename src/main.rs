@@ -50,13 +50,15 @@ impl Ctx {
 
             writer.write("# Locals: ".as_bytes());
             writer.write(f.locals.connect(", ").as_bytes());
+            writer.write("\n".as_bytes());
+
 
             writer.write("# Stmts:\n".as_bytes());
             for s in &f.stmts {
                 writer.write(format!("# {:?}\n", s).as_bytes());
             }
 
-            writer.write("\n}\n".as_bytes());
+            writer.write("}\n\n".as_bytes());
             writer.flush();
         }
     }
