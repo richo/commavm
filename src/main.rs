@@ -13,6 +13,7 @@ mod analysis;
 struct Func {
     pub name: String,
     locals: Vec<analysis::Name>,
+    stmts: Vec<analysis::Stmt>,
 }
 
 enum Value {
@@ -78,10 +79,12 @@ fn process_crate(krate: ast::Crate) -> Ctx {
         match it.node {
             ast::ItemFn(ref dec, safety, abi, _, ref blk) => {
                 let vars = analysis::locals(blk);
+                let stmts = analysis::stmts(blk);
 
                 ctx.add_fn(Func {
                     name: it.ident.as_str().to_string(),
                     locals: vars,
+                    stmts: stmts,
                 });
             },
             ref other => {
