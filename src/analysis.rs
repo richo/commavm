@@ -27,25 +27,28 @@ pub fn locals(blk: &ast::Block) -> Vec<Name> {
 pub type Receiver = String;
 
 // Opaque for now
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 struct Value;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 enum Arg {
     Literal(Value),
     Bound(Name),
 }
 
+#[derive(Debug)]
 struct Funcall {
     receiver: Receiver,
     arguments: Vec<Arg>
 }
 
+#[derive(Debug)]
 struct Assignment {
     receiver: Name,
     target: Name, // TODO
 }
 
+#[derive(Debug)]
 pub enum Stmt {
     Funcall(Funcall),
     Assignment(Assignment),
