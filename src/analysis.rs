@@ -87,6 +87,7 @@ pub fn stmts(blk: &ast::Block) -> Vec<Stmt> {
             ast::StmtSemi(ref expr, ref id) => {
                 if let ast::ExprCall(ref expr, ref id) = expr.node {
                     if let ast::ExprPath(_, ref path) = expr.node {
+                        assert!(path.segments.len() == 1);
                         let ref segment = path.segments[0];
                         stmts.push(Stmt::funcall(segment.identifier, &[]));
                     }
