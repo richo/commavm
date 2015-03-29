@@ -49,7 +49,8 @@ fn process_crate(krate: ast::Crate) -> Ctx {
 }
 
 fn main() {
-    let ref input = ::std::os::args()[1];
+    let args: Vec<_> = ::std::env::args().collect();
+    let ref input = args[1];
 
     let krate = load_file(input);
     let ctx = process_crate(krate);
