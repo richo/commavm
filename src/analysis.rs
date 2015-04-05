@@ -31,7 +31,7 @@ pub type Receiver = String;
 struct Value;
 
 #[derive(Clone,Debug)]
-enum Arg {
+pub enum Arg {
     Literal(Value),
     Bound(Name),
 }
@@ -64,7 +64,7 @@ pub enum Rvalue {
 
 impl Stmt {
     // Mostly just for sanity reasons
-    fn funcall(receiver: ast::Ident, arguments: &[Arg]) -> Stmt {
+    fn funcall(receiver: ast::Ident, arguments: Vec<Arg>) -> Stmt {
         Stmt::Funcall(Funcall {
             receiver: receiver.as_str().to_string(),
             arguments: arguments.to_vec(),
@@ -79,17 +79,25 @@ impl Stmt {
     }
 }
 
+pub fn parse_arg(arg: &ast::Expr_) -> Arg {
+    if let &ast::ExprPath(_, ref path) = arg {
+        return Arg::Bound(path.segments[0].identifier.as_str().to_string());
+    }
+    return Arg::Literal(Value);
+}
+
 pub fn stmts(blk: &ast::Block) -> Vec<Stmt> {
     let mut stmts = Vec::new();
     for stmt in &blk.stmts {
         match stmt.node {
             ast::StmtDecl(..) => {},
             ast::StmtSemi(ref expr, ref id) => {
-                if let ast::ExprCall(ref expr, ref id) = expr.node {
+                if let ast::ExprCall(ref expr, ref args) = expr.node {
                     if let ast::ExprPath(_, ref path) = expr.node {
+                        let parsed_args = args.iter().map(move |a| parse_arg(&a.node)).collect();
                         assert!(path.segments.len() == 1);
                         let ref segment = path.segments[0];
-                        stmts.push(Stmt::funcall(segment.identifier, &[]));
+                        stmts.push(Stmt::funcall(segment.identifier, parsed_args));
                     }
                 } else
                 if let ast::ExprAssign(ref expr, ref id) = expr.node {
