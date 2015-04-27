@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::io;
 use analysis;
 
 pub struct Func {
@@ -26,24 +26,26 @@ impl Ctx {
         self.fns.push(f);
     }
 
-    pub fn emit<W: Write>(&self, writer: &mut W) {
+    pub fn emit<W: io::Write>(&self, writer: &mut W) -> Result<usize, io::Error> {
+        let mut acc: usize = 0;
         for f in self.fns() {
-            writer.write(f.name.as_bytes());
-            writer.write("() {\n".as_bytes());
+            acc += try!(writer.write(f.name.as_bytes()));
+            acc += try!(writer.write("() {\n".as_bytes()));
 
-            writer.write("# Locals: ".as_bytes());
-            writer.write(f.locals.connect(", ").as_bytes());
-            writer.write("\n".as_bytes());
+            acc += try!(writer.write("# Locals: ".as_bytes()));
+            acc += try!(writer.write(f.locals.connect(", ").as_bytes()));
+            acc += try!(writer.write("\n".as_bytes()));
 
 
-            writer.write("# Stmts:\n".as_bytes());
+            acc += try!(writer.write("# Stmts:\n".as_bytes()));
             for s in &f.stmts {
-                writer.write(format!("# {:?}\n", s).as_bytes());
+                acc += try!(writer.write(format!("# {:?}\n", s).as_bytes()));
             }
 
-            writer.write("}\n\n".as_bytes());
-            writer.flush();
+            acc += try!(writer.write("}\n\n".as_bytes()));
+            try!(writer.flush());
         }
+        Ok(acc)
     }
 
     fn declare_local(&mut self, name: &str) {
