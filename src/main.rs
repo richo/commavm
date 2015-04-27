@@ -56,8 +56,7 @@ fn main() {
 
     let krate = match load_file(input) {
         Ok(krate) => krate,
-        Err(err) => {
-            println!("{}", err);
+        Err(_) => {
             std::env::set_exit_status(1);
             return;
         },
