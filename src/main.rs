@@ -1,10 +1,12 @@
+#![feature(exit_status)]
 #![feature(rustc_private)]
 
 extern crate syntax;
 
-use syntax::{parse,ast,abi};
+use syntax::{parse,ast,abi,diagnostic};
 use std::path;
 use std::io;
+use std::env;
 use std::collections::HashMap;
 use context::{Ctx,Func};
 
@@ -12,7 +14,7 @@ mod analysis;
 mod coherence;
 mod context;
 
-fn load_file(name: &str) -> ast::Crate {
+fn load_file(name: &str) -> Result<ast::Crate, diagnostic::FatalError>  {
     let file = path::Path::new(name);
 
 
@@ -52,7 +54,14 @@ fn main() {
     let args: Vec<_> = ::std::env::args().collect();
     let ref input = args[1];
 
-    let krate = load_file(input);
+    let krate = match load_file(input) {
+        Ok(krate) => krate,
+        Err(err) => {
+            println!("{}", err);
+            std::env::set_exit_status(1);
+            return;
+        },
+    };
     let ctx = process_crate(krate);
 
     ctx.emit(&mut io::stdout());
