@@ -3,11 +3,11 @@
 
 extern crate syntax;
 
-use syntax::{parse,ast,abi,diagnostic};
+use syntax::{parse,ast,diagnostic};
 use std::path;
 use std::io;
 use std::env;
-use std::collections::HashMap;
+
 use context::{Ctx,Func};
 
 mod analysis;
@@ -57,7 +57,7 @@ fn main() {
     let krate = match load_file(input) {
         Ok(krate) => krate,
         Err(_) => {
-            std::env::set_exit_status(1);
+            env::set_exit_status(1);
             return;
         },
     };

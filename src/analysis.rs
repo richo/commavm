@@ -1,8 +1,4 @@
-use syntax::{parse,ast,abi};
-use std::path;
-use std::io::Write;
-use std::io;
-use std::collections::HashMap;
+use syntax::ast;
 
 pub type Name = String;
 
