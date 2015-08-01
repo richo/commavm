@@ -18,7 +18,7 @@ fn load_file(name: &str) -> Result<ast::Crate, diagnostic::FatalError>  {
     let file = path::Path::new(name);
 
 
-    let sess = parse::new_parse_sess();
+    let sess = parse::ParseSess::new();
     let cfg = vec![];
 
     let mut parser = parse::new_parser_from_file(&sess, cfg, &file);
@@ -31,7 +31,7 @@ fn process_crate(krate: ast::Crate) -> Ctx {
 
     for it in &krate.module.items {
         match it.node {
-            ast::ItemFn(ref dec, safety, abi, _, ref blk) => {
+            ast::ItemFn(ref dec, safety, _, abi, _, ref blk) => {
                 let vars = analysis::locals(blk);
                 let stmts = analysis::stmts(blk);
 
