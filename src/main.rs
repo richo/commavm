@@ -36,7 +36,7 @@ fn process_crate(krate: ast::Crate) -> Ctx {
                 let stmts = analysis::stmts(blk);
 
                 ctx.add_fn(Func {
-                    name: it.ident.as_str().to_string(),
+                    name: it.ident.to_string(),
                     locals: vars,
                     stmts: stmts,
                 });

@@ -9,7 +9,7 @@ pub fn locals(blk: &ast::Block) -> Vec<Name> {
         if let ast::StmtDecl(ref decl, ref id) = stmt.node {
             if let ast::DeclLocal(ref n) = decl.node {
                 if let ast::PatIdent(ref mode, ref span, ref pat) = n.pat.node {
-                    locals.push(span.node.name.as_str().to_string());
+                    locals.push(span.node.name.to_string());
                 }
             }
         }
@@ -62,14 +62,14 @@ impl Stmt {
     // Mostly just for sanity reasons
     fn funcall(receiver: ast::Ident, arguments: Vec<Arg>) -> Stmt {
         Stmt::Funcall(Funcall {
-            receiver: receiver.as_str().to_string(),
+            receiver: receiver.to_string(),
             arguments: arguments.to_vec(),
         })
     }
 
     fn assign(receiver: ast::Ident, target: Rvalue) -> Stmt {
         Stmt::Assignment(Assignment {
-            receiver: receiver.as_str().to_string(),
+            receiver: receiver.to_string(),
             target: target,
         })
     }
@@ -77,7 +77,7 @@ impl Stmt {
 
 pub fn parse_arg(arg: &ast::Expr_) -> Arg {
     if let &ast::ExprPath(_, ref path) = arg {
-        return Arg::Bound(path.segments[0].identifier.as_str().to_string());
+        return Arg::Bound(path.segments[0].identifier.to_string());
     }
     return Arg::Literal(Value);
 }
