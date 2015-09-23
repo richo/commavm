@@ -57,8 +57,7 @@ fn main() {
     let krate = match load_file(input) {
         Ok(krate) => krate,
         Err(_) => {
-            env::set_exit_status(1);
-            return;
+            std::process::exit(1);
         },
     };
     let ctx = process_crate(krate);
