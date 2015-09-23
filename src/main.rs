@@ -2,7 +2,9 @@
 #![feature(rustc_private)]
 
 extern crate syntax;
+extern crate rustc_back;
 
+use rustc_back::svh::Svh;
 use syntax::{parse,ast,diagnostic};
 use std::path;
 use std::io;
@@ -54,13 +56,20 @@ fn main() {
     let args: Vec<_> = ::std::env::args().collect();
     let ref input = args[1];
 
+    let ref op = args[2];
+
     let krate = match load_file(input) {
         Ok(krate) => krate,
         Err(_) => {
             std::process::exit(1);
         },
     };
-    let ctx = process_crate(krate);
-
-    ctx.emit(&mut io::stdout());
+    if op == "hash" {
+        let v = vec![];
+        let hash = Svh::calculate(&v, &krate);
+        println!("{}", hash.as_str());
+    } else {
+        let ctx = process_crate(krate);
+        ctx.emit(&mut io::stdout());
+    }
 }
